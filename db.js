@@ -1,5 +1,7 @@
 const mongoose=require('mongoose');
-const mongoURI="mongodb+srv://viratkohli0737:B4PMsOOoq8vtL3TW@cluster0.erluey0.mongodb.net/";
+require('dotenv').config();
+// const mongoURI="mongodb+srv://viratkohli0737:B4PMsOOoq8vtL3TW@cluster0.erluey0.mongodb.net/";
+const mongoURI= process.env.DB_Link;
 const connectToMongo= async()=>{
         try{
           await  mongoose.connect(mongoURI);
