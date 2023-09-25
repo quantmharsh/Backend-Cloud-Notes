@@ -37,4 +37,34 @@ router.post('/addnotes' ,fetchUser,[
     }
 
 })
+
+//Router 3: put request for updating notes
+router.put('/updatenotes/:id' ,fetchUser ,async(req ,res)=>{
+  //destructuring our request
+ const  {title ,description ,tag}=req.body;
+ //checking whether notes exist or not
+ const newNote={};
+ if(title)newNote.title=title;
+ if(description)newNote.description=description;
+ if(tag)newNote.tag=tag;
+  
+ //checking whether  note with this id existed or not
+ let note=  await Notes.findById(req.params.id);
+ if(!note)
+ {
+  return res.status(401).send("Requested id not found..");
+
+ }
+ //checking whether its same user whose id is their
+ if(req.user.id!=note.user.toString())
+ {
+  return res.status(404).send("Update not approved..");
+ }
+ //if we reach here that means our user is original whose notes need to be updated
+  note=await Notes.findByIdAndUpdate(req.params.id , {$set :newNote} ,{new:true});
+  res.send({note});
+
+  
+
+})
 module.exports=router;
