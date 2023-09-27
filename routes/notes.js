@@ -67,4 +67,24 @@ router.put('/updatenotes/:id' ,fetchUser ,async(req ,res)=>{
   
 
 })
+
+//Router 4: creating DELETE route for deleting notes
+router.delete('/deletenotes/:id' ,fetchUser ,async(req ,res)=>{
+  try{
+    let note= await Notes.findById(req.params.id);
+    if(!note){
+      return res.status(404).json({"error":"Note not found.. "});
+   }
+   if(note.user.toString()!=req.user.id)
+   {
+    return res.send().json({"error":"Note not found"});
+   }
+    note= await Notes.findByIdAndDelete(req.params.id );
+    res.json({"success":"Note Deleted successfully"});
+  }
+  catch(error){
+    res.status(501).json({"error":"Internal server error while deleting note.."});
+
+  }
+})
 module.exports=router;
