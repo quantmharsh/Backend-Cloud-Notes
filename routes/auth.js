@@ -19,19 +19,23 @@ router.post('/createuser',[
     body('email' ,'enter valid email address').isEmail(),
     body('password' ,'password size should be more then 5').isLength({min:5})
 ],async (req ,res)=>{
+ 
     try{
+      let success=false;
      console.log(req.body);
      const errors= validationResult(req);
      if(!errors.isEmpty())
      {
-        return res.status(400).json({errors:errors.array()});
+      success=false;
+        return res.status(400).json({success ,errors:errors.array()});
      }
     
      //passing the req.body in User database and storing it 
      const existingUser= await User.findOne({email:req.body.email});
      if(existingUser)
      {
-        return res.status(400).json({error:"user already existed"});
+      success=false;
+        return res.status(400).json({success ,error:"user already existed"});
      }
     //  const user= User(req.body);
     //   await user.save();
@@ -54,8 +58,10 @@ router.post('/createuser',[
          const authToken= jwt.sign(data ,JWT_SECRET);
 
         //  res.json(user)
-        res.json({authToken});
-      res.status(201).json({message:"User created succesfully"});
+        success=true;
+        res.json({success ,authToken});
+        //only we can send one reponse at a time so i was getting error her
+        // res.status(201).json({message:"User created succesfully"});
     }//try closed
     catch(error)
     {
@@ -81,15 +87,18 @@ router.post('/login',[
     try{
         //checking whether user is present in our db or  not
     const user=await User.findOne({email:req.body.email});
+    let success=false;
     
     if(!user)
     {
+      success=false;
         return res.status(400).json({error:"please check your login credential again"});
     }
      //if he is present then we will check its password
       const passwordCompare=  await bcrypt.compare(password ,user.password);
       if(!passwordCompare)
       {
+        success=false;
         return  res.status(400).json({ error: "please check your login credentials again"})
       }
       //now creating token same steps
@@ -99,7 +108,8 @@ router.post('/login',[
         }
       }
       const authToken = jwt.sign(data , JWT_SECRET);
-      res.json({authToken});
+      success=true;
+      res.json({success ,authToken});
      
       
     }
